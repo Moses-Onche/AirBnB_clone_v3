@@ -1,4 +1,4 @@
-usr/bin/python3
+#!/usr/bin/python3
 '''Contains the places view for the API.'''
 from flask import jsonify, request
 from werkzeug.exceptions import NotFound, MethodNotAllowed, BadRequest
