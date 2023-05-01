@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 '''
     flask with general routes
     routes:
