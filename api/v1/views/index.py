@@ -11,25 +11,23 @@ from models.city import City
 from models.user import User
 
 
-@app_views.route('/status')
+@app_views.route('/status', methods=['GET'])
 def get_status():
     """Get status of API."""
     return jsonify(status='OK')
 
 
-@app_views.route('/stats')
+@app_views.route('/stats', methods=['GET'])
 def get_num_objects():
     """Get number of objects by type."""
     count = {}
-    obj = {
-        'amenities': Amenity,
-        'cities': City,
-        'places': Place,
-        'reviews': Review,
-        'states': State,
-        'users': User
+    objs = {
+        'amenities': storage.count(Amenity),
+        'cities': storage.count(City),
+        'places': storage.count(Place),
+        'reviews': storage.count(Review),
+        'states': storage.count(State),
+        'users': storage.count(User)
     }
 
-    for key, item in obj.items():
-        count[key] = storage.count(item)
-    return jsonify(count)
+    return jsonify(objs)
