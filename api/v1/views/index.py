@@ -9,7 +9,7 @@ def get_status():
     """Get status of API."""
     return jsonify(status='OK')
 
-@app.route('/stats')
+@app.route('/api/v1/stats')
 def get_num_objects():
     """Get number of objects by type."""
     obj = {
