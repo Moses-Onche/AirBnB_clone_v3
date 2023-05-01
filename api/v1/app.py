@@ -20,6 +20,7 @@ def teardown_flask(exception):
     # print(exception)
     storage.close()
 
+
 if __name__ == '__main__':
     app_host = os.getenv('HBNB_API_HOST', '0.0.0.0')
     app_port = int(os.getenv('HBNB_API_PORT', '5000'))
