@@ -2,6 +2,13 @@
 """Defines the index page."""
 from flask import jsonify
 from api.v1.views import app_views
+from models import storage
+from models.amenity import Amenity
+from models.place import Place
+from models.state import State
+from models.review import Review
+from models.city import City
+from models.user import User
 
 
 @app_views.route('/status')
@@ -13,6 +20,7 @@ def get_status():
 @app.route('/stats')
 def get_num_objects():
     """Get number of objects by type."""
+    count = {}
     obj = {
         'amenities': Amenity,
         'cities': City,
@@ -23,5 +31,5 @@ def get_num_objects():
     }
 
     for key, item in obj.items():
-        obj[key] = storage.count(item)
-    return jsonify(obj)
+        count[key] = storage.count(item)
+    return jsonify(count)
