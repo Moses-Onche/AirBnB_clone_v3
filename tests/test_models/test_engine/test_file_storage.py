@@ -113,3 +113,41 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+        
+    def test_get(self):
+        """test that get returns an object of a given class by id."""
+        storage = models.storage
+        state_obj = State(name='Texas')
+        state_obj.save()
+        self.assertEqual(state_obj.id, storage.get(State, state_obj.id).id)
+        self.assertEqual(state_obj.name, storage.get(State, state_obj.id).name)
+        self.assertIsNot(state_obj, storage.get(State, state_obj.id + 'op'))
+        self.assertIsNone(storage.get(State, state_obj.id + 'op'))
+        self.assertIsNone(storage.get(State, 45))
+        self.assertIsNone(storage.get(int, state_obj.id))
+        self.assertIsNone(storage.get(None, state_obj.id))
+        with self.assertRaises(TypeError):
+            storage.get(State, state_obj.id, 'op')
+        with self.assertRaises(TypeError):
+            storage.get()
+        with self.assertRaises(TypeError):
+            storage.get(State)
+
+    def test_count(self):
+        """test that count returns the number of objects of a given class."""
+        storage = models.storage
+        self.assertIs(type(storage.count()), int)
+        self.assertIs(type(storage.count(int)), int)
+        self.assertEqual(storage.count(), storage.count(None))
+        self.assertIs(type(storage.count(State)), int)
+        self.assertIs(type(storage.count(None)), int)
+        State(name='Iowa').save()
+        self.assertGreater(storage.count(State), 0)
+        self.assertEqual(storage.count(), storage.count(None))
+        num = storage.count(State)
+        State(name='New Jersey').save()
+        self.assertGreater(storage.count(State), num)
+        Amenity(name='Pressing Iron').save()
+        self.assertGreater(storage.count(), storage.count(State))
+        with self.assertRaises(TypeError):
+            storage.count(State, 'op')
