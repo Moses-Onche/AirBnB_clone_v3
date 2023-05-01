@@ -67,23 +67,64 @@ test_db_storage.py'])
             self.assertTrue(len(func[1].__doc__) >= 1,
                             "{:s} method needs a docstring".format(func[0]))
 
-"""
-class TestFileStorage(unittest.TestCase):
-    """Test the FileStorage class"""
-    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+@unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+class TestDBStorage(unittest.TestCase):
+    """Test the DBStorage class"""
     def test_all_returns_dict(self):
-        """Test that all returns a dictionaty"""
-        self.assertIs(type(models.storage.all()), dict)
+        """Test that all returns a dictionary"""
+        check = type(models.storage.all())
+        self.assertIs(check, dict)
 
-    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_all_no_class(self):
         """Test that all returns all rows when no class is passed"""
 
-    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_new(self):
         """test that new adds an object to the database"""
+        state_obj = State(name="Wyoming")
+        storage.new(state_obj)
+        self.assertIn(state_obj, storage._DBStorage__session)
 
-    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
-"""
+        state_obj = State(name="Wyoming")
+        storage.new(state_obj)
+        storage.save()
+        self.assertIn(state_obj, storage.all().values())
+
+    def test_get(self):
+        """test that get returns an object of a given class by id."""
+        storage = models.storage
+        state_obj = State(name='Texas')
+        state_obj.save()
+        self.assertEqual(state_obj.id, storage.get(State, state_obj.id).id)
+        self.assertEqual(state_obj.name, storage.get(State, state_obj.id).name)
+        self.assertIsNot(state_obj, storage.get(State, state_obj.id + 'op'))
+        self.assertIsNone(storage.get(State, state_obj.id + 'op'))
+        self.assertIsNone(storage.get(State, 45))
+        self.assertIsNone(storage.get(int, state_obj.id))
+        self.assertIsNone(storage.get(None, state_obj.id))
+        with self.assertRaises(TypeError):
+            storage.get(State, state_obj.id, 'op')
+        with self.assertRaises(TypeError):
+            storage.get()
+        with self.assertRaises(TypeError):
+            storage.get(State)
+
+    def test_count(self):
+        """test that count returns the number of objects of a given class."""
+        storage = models.storage
+        self.assertIs(type(storage.count()), int)
+        self.assertIs(type(storage.count(int)), int)
+        self.assertEqual(storage.count(), storage.count(None))
+        self.assertIs(type(storage.count(State)), int)
+        self.assertIs(type(storage.count(None)), int)
+        State(name='Iowa').save()
+        self.assertGreater(storage.count(State), 0)
+        self.assertEqual(storage.count(), storage.count(None))
+        num = storage.count(State)
+        State(name='New Jersey').save()
+        self.assertGreater(storage.count(State), num)
+        Amenity(name='Pressing Iron').save()
+        self.assertGreater(storage.count(), storage.count(State))
+        with self.assertRaises(TypeError):
+            storage.count(State, 'op')
